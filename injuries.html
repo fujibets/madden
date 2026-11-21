@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NFL Injury & Madden OVR Impact</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --subcard: #0f172a;
+      --border: #334155;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #3b82f6;
+      --red: #ef4444;
+      --amber: #f59e0b;
+      --green: #22c55e;
+      --gold: #eab308;
+      --purple: #a855f7;
+    }
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      width: 100%;
+      max-width: 960px;
+    }
+    .header-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .top-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    h1 { margin: 0; font-size: 1.4rem; }
+    .nav-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      font-size: 0.9rem;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+    select, input[type="number"], button {
+      background: var(--subcard);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-size: 0.9rem;
+    }
+    input[type="number"] { width: 64px; text-align: center; font-weight: 700; }
+    button {
+      background: var(--accent);
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .status-line {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 10px;
+    }
+    .matchup-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+    .matchup-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 10px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .matchup-title { font-size: 1.15rem; font-weight: 800; }
+    .matchup-time { color: var(--muted); font-size: 0.85rem; }
+    .teams-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 720px) {
+      .teams-grid { grid-template-columns: 1fr; }
+    }
+    .team-col {
+      background: var(--subcard);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+    }
+    .team-name {
+      font-weight: 800;
+      font-size: 1rem;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .team-pills {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .net-pill {
+      font-size: 0.76rem;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+    .net-bad { background: rgba(239, 68, 68, 0.22); color: #fca5a5; border: 1px solid var(--red); }
+    .net-mid { background: rgba(245, 158, 11, 0.22); color: #fcd34d; border: 1px solid var(--amber); }
+    .net-zero { background: #1e293b; color: var(--muted); border: 1px solid var(--border); }
+    .net-ret { background: rgba(34, 197, 94, 0.2); color: #86efac; border: 1px solid var(--green); }
+    .net-ret-elite { background: rgba(234, 179, 8, 0.24); color: #fef08a; border: 1px solid var(--gold); }
+    .cluster-box {
+      background: rgba(168, 85, 247, 0.14);
+      border: 1px solid var(--purple);
+      color: #e9d5ff;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .injury-row {
+      border-top: 1px solid #1e293b;
+      padding: 9px 0;
+    }
+    .injury-row:first-of-type { border-top: none; padding-top: 2px; }
+    .row-return-std {
+      background: rgba(34, 197, 94, 0.08);
+      border: 1px solid rgba(34, 197, 94, 0.35);
+      border-radius: 8px;
+      padding: 8px 10px;
+      margin: 6px 0;
+    }
+    .row-return-elite {
+      background: rgba(234, 179, 8, 0.14);
+      border: 1px solid var(--gold);
+      border-radius: 8px;
+      padding: 8px 10px;
+      margin: 6px 0;
+    }
+    .row-main {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .player-info { font-weight: 700; font-size: 0.95rem; }
+    .pos-tag {
+      display: inline-block;
+      background: #334155;
+      color: #e2e8f0;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-right: 5px;
+    }
+    .badge {
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .badge-out { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid var(--red); }
+    .badge-exit { background: rgba(239, 68, 68, 0.32); color: #fecaca; border: 1px solid var(--red); }
+    .badge-doubt { background: rgba(245, 158, 11, 0.2); color: #fcd34d; border: 1px solid var(--amber); }
+    .badge-quest { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid var(--accent); }
+    .badge-ir { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; border: 1px solid var(--purple); }
+    .badge-ret-std { background: rgba(34, 197, 94, 0.22); color: #86efac; border: 1px solid var(--green); }
+    .badge-ret-elite { background: rgba(234, 179, 8, 0.28); color: #fef08a; border: 1px solid var(--gold); }
+    .ovr-compare {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.84rem;
+      margin-top: 4px;
+      color: var(--muted);
+    }
+    .ovr-num { color: var(--text); font-weight: 700; }
+    .delta-bad { color: #f87171; font-weight: 800; }
+    .delta-mid { color: #fbbf24; font-weight: 700; }
+    .delta-ok { color: var(--muted); font-weight: 600; }
+    .ret-note-std { color: #86efac; font-weight: 700; }
+    .ret-note-elite { color: #fde047; font-weight: 800; }
+    .comment-text {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 4px;
+      line-height: 1.35;
+    }
+    .clean-msg { color: var(--muted); font-size: 0.85rem; font-style: italic; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header-card">
+      <div class="top-bar">
+        <h1>NFL Injury & Madden OVR Impact</h1>
+        <a href="index.html" class="nav-link">← Roster Guess Game</a>
+      </div>
+      <div class="controls">
+        <label>
+          Slate:
+          <select id="slateSelect">
+            <option value="auto">Auto (Sun 6pm ET Rollover)</option>
+            <option value="current">Current ESPN Slate</option>
+            <option value="next">Next Week Lookahead</option>
+          </select>
+        </label>
+        <label>
+          View:
+          <select id="viewSelect">
+            <option value="matchups">By Matchup</option>
+            <option value="ranked">Biggest OVR Drops</option>
+          </select>
+        </label>
+        <label>
+          Min Starter OVR (excl. QB):
+          <input type="number" id="minOvrInput" min="50" max="99" value="75" />
+        </label>
+        <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+          <input type="checkbox" id="showOldIr" />
+          Show Older IR
+        </label>
+        <button id="reloadBtn">Refresh</button>
+      </div>
+      <div class="status-line" id="statusLine">Loading Madden CSV, live depth charts & ESPN feeds...</div>
+    </div>
+
+    <div id="contentArea"></div>
+  </div>
+
+  <script>
+    const BUCKET_MAP = {
+      "QB": "QB",
+      "HB": "RB", "RB": "RB", "FB": "RB",
+      "WR": "WR", "WR1": "WR", "WR2": "WR", "WR3": "WR",
+      "TE": "TE",
+      "LT": "OT", "RT": "OT", "OT": "OT", "T": "OT",
+      "LG": "OG", "RG": "OG", "G": "OG", "OG": "OG",
+      "C": "C",
+      "LEDG": "EDGE", "REDG": "EDGE", "DE": "EDGE", "LDE": "EDGE", "RDE": "EDGE",
+      "DT": "DT", "NT": "DT", "LDT": "DT", "RDT": "DT",
+      "MIKE": "LB", "WILL": "LB", "SAM": "LB", "MLB": "LB", "OLB": "LB", "ILB": "LB", "LB": "LB", "WLB": "LB", "SLB": "LB",
+      "CB": "CB", "LCB": "CB", "RCB": "CB", "NB": "CB",
+      "FS": "S", "SS": "S", "S": "S"
+    };
+
+    const FALLBACK_STARTER_SLOTS = {
+      "QB": 1, "RB": 1, "WR": 3, "TE": 1,
+      "OT": 2, "OG": 2, "C": 1,
+      "EDGE": 2, "DT": 2, "LB": 2, "CB": 2, "S": 2
+    };
+
+    const OL_BUCKETS = new Set(["OT", "OG", "C"]);
+    const DL_BUCKETS = new Set(["EDGE", "DT"]);
+
+    const TEAM_NORM = {
+      "arizona cardinals": "ARI", "ari": "ARI",
+      "atlanta falcons": "ATL", "atl": "ATL",
+      "baltimore ravens": "BAL", "bal": "BAL",
+      "buffalo bills": "BUF", "buf": "BUF",
+      "carolina panthers": "CAR", "car": "CAR",
+      "chicago bears": "CHI", "chi": "CHI",
+      "cincinnati bengals": "CIN", "cin": "CIN",
+      "cleveland browns": "CLE", "cle": "CLE",
+      "dallas cowboys": "DAL", "dal": "DAL",
+      "denver broncos": "DEN", "den": "DEN",
+      "detroit lions": "DET", "det": "DET",
+      "green bay packers": "GB", "gb": "GB", "gnb": "GB",
+      "houston texans": "HOU", "hou": "HOU",
+      "indianapolis colts": "IND", "ind": "IND",
+      "jacksonville jaguars": "JAX", "jax": "JAX", "jac": "JAX",
+      "kansas city chiefs": "KC", "kc": "KC", "kan": "KC",
+      "las vegas raiders": "LV", "lv": "LV", "lvr": "LV", "oak": "LV",
+      "los angeles chargers": "LAC", "lac": "LAC", "sd": "LAC",
+      "los angeles rams": "LAR", "lar": "LAR", "la": "LAR",
+      "miami dolphins": "MIA", "mia": "MIA",
+      "minnesota vikings": "MIN", "min": "MIN",
+      "new england patriots": "NE", "ne": "NE", "nep": "NE",
+      "new orleans saints": "NO", "no": "NO", "nor": "NO",
+      "new york giants": "NYG", "nyg": "NYG",
+      "new york jets": "NYJ", "nyj": "NYJ",
+      "philadelphia eagles": "PHI", "phi": "PHI",
+      "pittsburgh steelers": "PIT", "pit": "PIT",
+      "san francisco 49ers": "SF", "sf": "SF", "sfo": "SF",
+      "seattle seahawks": "SEA", "sea": "SEA",
+      "tampa bay buccaneers": "TB", "tb": "TB", "tam": "TB",
+      "tennessee titans": "TEN", "ten": "TEN",
+      "washington commanders": "WAS", "was": "WAS", "wsh": "WAS"
+    };
+
+    const PREF_KEY = "fujibets_injuries_prefs_v5";
+
+    let maddenByTeam = {};
+    let maddenAllByNorm = {};
+    let espnInjuriesByTeam = {};
+    let espnDepthByTeam = {};
+    let currentScoreboard = null;
+    let nextScoreboard = null;
+    let gameMetaByTeam = {};
+
+    function loadSavedPrefs() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(PREF_KEY) || "{}");
+        if (saved.slate) document.getElementById("slateSelect").value = saved.slate;
+        if (saved.view) document.getElementById("viewSelect").value = saved.view;
+        if (saved.minOvr) document.getElementById("minOvrInput").value = saved.minOvr;
+        if (typeof saved.showOldIr === "boolean") {
+          document.getElementById("showOldIr").checked = saved.showOldIr;
+        }
+      } catch (_) {}
+    }
+
+    function savePrefs() {
+      try {
+        localStorage.setItem(PREF_KEY, JSON.stringify({
+          slate: document.getElementById("slateSelect").value,
+          view: document.getElementById("viewSelect").value,
+          minOvr: document.getElementById("minOvrInput").value,
+          showOldIr: document.getElementById("showOldIr").checked
+        }));
+      } catch (_) {}
+    }
+
+    function normTeam(raw) {
+      if (!raw) return "";
+      const k = raw.trim().toLowerCase();
+      return TEAM_NORM[k] || raw.trim().toUpperCase();
+    }
+
+    function normName(raw) {
+      return (raw || "")
+        .toLowerCase()
+        .replace(/\b(jr|sr|ii|iii|iv|v)\b\.?/g, "")
+        .replace(/[^a-z0-9]/g, "");
+    }
+
+    function mapBucket(pos) {
+      if (!pos) return null;
+      const clean = pos.trim().toUpperCase();
+      if (BUCKET_MAP[clean]) return BUCKET_MAP[clean];
+      // Strip trailing numbers like WR1, CB2, LDE1
+      const stripped = clean.replace(/[0-9]+$/, "");
+      return BUCKET_MAP[stripped] || null;
+    }
+
+    function parseCSV(text) {
+      const lines = text.trim().split(/\r?\n/);
+      const delim = lines[0].includes("\t") ? "\t" : ",";
+      const headers = lines[0].split(delim).map(h => h.trim().replace(/^"|"$/g, "").toLowerCase());
+
+      const idxFirst = headers.findIndex(h => h === "first name" || h === "firstname");
+      const idxLast = headers.findIndex(h => h === "last name" || h === "lastname");
+      const idxPlayer = headers.findIndex(h => h === "player" || h === "name");
+      const idxPosId = headers.findIndex(h => h === "position id" || h === "positionid");
+      const idxPos = headers.findIndex(h => h === "position" || h === "pos");
+      const idxTeam = headers.findIndex(h => h === "team");
+      const idxOvr = headers.findIndex(h => h === "overall" || h === "ovr");
+
+      const posCol = idxPosId !== -1 ? idxPosId : idxPos;
+      const byTeam = {};
+      const allByNorm = {};
+
+      for (let i = 1; i < lines.length; i++) {
+        const cols = lines[i].split(delim).map(c => c.trim().replace(/^"|"$/g, ""));
+        if (cols.length < 4) continue;
+
+        const name = idxPlayer !== -1
+          ? cols[idxPlayer]
+          : `${cols[idxFirst] || ""} ${cols[idxLast] || ""}`.trim();
+        const team = normTeam(cols[idxTeam]);
+        const bucket = mapBucket(cols[posCol]);
+        const ovr = parseInt(cols[idxOvr], 10);
+
+        if (!name || !bucket || isNaN(ovr)) continue;
+        const nName = normName(name);
+        const rec = { name, norm: nName, team, bucket, ovr, isStarter: false };
+
+        if (!allByNorm[nName] || ovr > allByNorm[nName].ovr) {
+          allByNorm[nName] = rec;
+        }
+
+        if (!team || team === "FREE AGENT" || team === "FA") continue;
+        if (!byTeam[team]) byTeam[team] = [];
+        byTeam[team].push(rec);
+      }
+
+      Object.values(byTeam).forEach(roster => {
+        roster.sort((a, b) => b.ovr - a.ovr);
+        const counts = {};
+        roster.forEach(p => {
+          counts[p.bucket] = (counts[p.bucket] || 0) + 1;
+          p.isStarter = counts[p.bucket] <= (FALLBACK_STARTER_SLOTS[p.bucket] || 1);
+        });
+      });
+
+      maddenAllByNorm = allByNorm;
+      return byTeam;
+    }
+
+    function lookupMaddenPlayer(teamAbbr, playerName, fallbackBucket) {
+      const nName = normName(playerName);
+      const teamRoster = maddenByTeam[teamAbbr] || [];
+      const exactTeam = teamRoster.find(p => p.norm === nName);
+      if (exactTeam) return exactTeam;
+
+      // Cross-league / Free Agent fallback (for recent signings like Josh Johnson)
+      const globalMatch = maddenAllByNorm[nName];
+      if (globalMatch) {
+        return { ...globalMatch, team: teamAbbr, bucket: fallbackBucket || globalMatch.bucket };
+      }
+      return null;
+    }
+
+    function isPastSunday6pmET() {
+      const now = new Date();
+      const etParts = new Intl.DateTimeFormat("en-US", {
+        timeZone: "America/New_York",
+        weekday: "short",
+        hour: "numeric",
+        hour12: false
+      }).formatToParts(now);
+
+      const day = etParts.find(p => p.type === "weekday")?.value;
+      const hour = parseInt(etParts.find(p => p.type === "hour")?.value || "0", 10);
+
+      if (day === "Sun" && hour >= 18) return true;
+      if (day === "Mon" || day === "Tue") return true;
+      return false;
+    }
+
+    function getTeamGameDate(board, teamAbbr) {
+      if (!board || !board.events) return null;
+      for (const ev of board.events) {
+        const comp = ev.competitions?.[0];
+        if (!comp) continue;
+        const hasTeam = comp.competitors?.some(c => normTeam(c.team?.abbreviation) === teamAbbr);
+        if (hasTeam) return new Date(ev.date);
+      }
+      return null;
+    }
+
+    function formatShortDate(dateObj) {
+      return dateObj.toLocaleDateString([], { month: "short", day: "numeric", timeZone: "UTC" });
+    }
+
+    // Resolve whether a player is a real starter on ESPN's live depth chart and find his exact backup
+    function resolveDepthChartRole(teamAbbr, playerNorm, fallbackBucket) {
+      const dc = espnDepthByTeam[teamAbbr];
+      if (!dc || dc.slots.length === 0) {
+        // Fallback to Madden OVR ranking if depth chart unavailable
+        const roster = maddenByTeam[teamAbbr] || [];
+        const p = roster.find(r => r.norm === playerNorm);
+        return {
+          hasLiveDepthChart: false,
+          isRealStarter: p ? p.isStarter : false,
+          bucket: p ? p.bucket : fallbackBucket,
+          slotChain: []
+        };
+      }
+
+      // Find all depth chart slots where this player appears
+      let bestMatch = null;
+      for (const slot of dc.slots) {
+        const idx = slot.chain.findIndex(a => a.norm === playerNorm);
+        if (idx !== -1) {
+          if (!bestMatch || idx < bestMatch.rankIndex) {
+            bestMatch = {
+              hasLiveDepthChart: true,
+              isRealStarter: idx === 0,
+              rankIndex: idx,
+              bucket: slot.bucket || fallbackBucket,
+              slotChain: slot.chain
+            };
+          }
+        }
+      }
+
+      if (bestMatch) return bestMatch;
+
+      // Player on injury report (e.g. IR) not currently listed on active 2-deep depth chart
+      return {
+        hasLiveDepthChart: true,
+        isRealStarter: false,
+        rankIndex: 99,
+        bucket: fallbackBucket,
+        slotChain: []
+      };
+    }
+
+    function evaluateTeamInjuries(teamAbbr, isNextWeekView, activeBoard) {
+      const roster = maddenByTeam[teamAbbr] || [];
+      const rawInjuries = espnInjuriesByTeam[teamAbbr] || [];
+      const minOvr = parseInt(document.getElementById("minOvrInput").value, 10) || 75;
+      const showOldIr = document.getElementById("showOldIr").checked;
+      const meta = gameMetaByTeam[teamAbbr] || null;
+      const nextGameDate = isNextWeekView ? getTeamGameDate(activeBoard, teamAbbr) : null;
+
+      const matched = [];
+      const injuredNorms = new Set();
+
+      for (const inj of rawInjuries) {
+        const statusLower = (inj.status || "").trim().toLowerCase();
+        const commentLower = (inj.comment || "").toLowerCase();
+        const isIr = statusLower.includes("injured reserve") || statusLower === "ir";
+
+        if (statusLower === "active" || statusLower === "probable") continue;
+        if (commentLower.includes("does not carry an injury designation")) continue;
+
+        const nName = normName(inj.name);
+        const espnBucket = mapBucket(inj.pos);
+        const dcRole = resolveDepthChartRole(teamAbbr, nName, espnBucket);
+        const bucket = dcRole.bucket || espnBucket;
+        if (!bucket) continue;
+
+        const maddenRec = lookupMaddenPlayer(teamAbbr, inj.name, bucket);
+        const player = maddenRec
+          ? { ...maddenRec, bucket }
+          : { name: inj.name, norm: nName, team: teamAbbr, bucket, ovr: null };
+
+        // Check if player is projected to return for Next Week Lookahead
+        let isReturningNextWeek = false;
+        let returnDateObj = null;
+        if (isNextWeekView && inj.returnDate && nextGameDate) {
+          const parsedRet = new Date(inj.returnDate);
+          if (!isNaN(parsedRet.getTime())) {
+            const retEndOfDay = new Date(parsedRet.getTime() + 24 * 60 * 60 * 1000);
+            if (retEndOfDay <= nextGameDate) {
+              isReturningNextWeek = true;
+              returnDateObj = parsedRet;
+            }
+          }
+        }
+
+        // Check in-game exit vs official game inactives
+        let isInGameExit = false;
+        if (!isReturningNextWeek && meta && meta.kickoff) {
+          const injDate = inj.date ? new Date(inj.date) : null;
+          const updatedAfterKickoff = injDate && !isNaN(injDate.getTime()) && injDate > meta.kickoff;
+
+          if (updatedAfterKickoff && !isIr) {
+            isInGameExit = true;
+          } else if (meta.hasStartedOrCompleted) {
+            if (meta.hasOfficialInactives) {
+              const onInactiveList = meta.inactiveNorms.has(player.norm);
+              if (!onInactiveList && !(isIr && showOldIr)) continue;
+            } else if (meta.completed && !(isIr && showOldIr)) {
+              continue;
+            }
+          }
+        }
+
+        // Filter stale IR when team already completed a game prior to IR date
+        if (isIr && !showOldIr && !isReturningNextWeek && meta && meta.completed && meta.kickoff && inj.date) {
+          const injDate = new Date(inj.date);
+          if (injDate < meta.kickoff) continue;
+        }
+
+        const isQb = bucket === "QB";
+        // Starter gate:
+        // 1) Must be index-0 starter on ESPN live depth chart (or top-2 QB on depth chart), OR
+        // 2) Returning starter from IR in Next Week Lookahead
+        const isQualifiedStarter = dcRole.hasLiveDepthChart
+          ? (dcRole.isRealStarter || (isQb && dcRole.rankIndex <= 1))
+          : dcRole.isRealStarter;
+
+        if (!isQualifiedStarter && !isReturningNextWeek) continue;
+
+        if (!isReturningNextWeek) {
+          injuredNorms.add(player.norm);
+        }
+
+        matched.push({
+          ...inj,
+          player,
+          bucket,
+          isQb,
+          dcRole,
+          isIr,
+          isInGameExit,
+          isReturningNextWeek,
+          returnDateObj
+        });
+      }
+
+      matched.sort((a, b) => (b.player.ovr || 0) - (a.player.ovr || 0));
+
+      const usedBackupNorms = new Set();
+      const evaluated = matched.map(item => {
+        if (item.isReturningNextWeek) {
+          // Compare returning starter against current healthy starter at that slot
+          let currentStarterOvr = null;
+          if (item.dcRole.slotChain.length > 0) {
+            const healthyStarter = item.dcRole.slotChain.find(a => !injuredNorms.has(a.norm) && a.norm !== item.player.norm);
+            if (healthyStarter) {
+              const bRec = lookupMaddenPlayer(teamAbbr, healthyStarter.name, item.bucket);
+              if (bRec) currentStarterOvr = bRec.ovr;
+            }
+          }
+          if (currentStarterOvr === null) {
+            const fallbackStarter = roster.find(p => p.bucket === item.bucket && !injuredNorms.has(p.norm) && p.norm !== item.player.norm);
+            if (fallbackStarter) currentStarterOvr = fallbackStarter.ovr;
+          }
+          const returnGain = (item.player.ovr !== null && currentStarterOvr !== null)
+            ? Math.max(0, item.player.ovr - currentStarterOvr)
+            : 0;
+          return { ...item, backup: null, delta: 0, returnGain };
+        }
+
+        // Find exact Next Man Up from ESPN's live depth chart slot first
+        let backup = null;
+        if (item.dcRole.slotChain && item.dcRole.slotChain.length > 0) {
+          const nextInSlot = item.dcRole.slotChain.find(a =>
+            a.norm !== item.player.norm &&
+            !injuredNorms.has(a.norm) &&
+            !usedBackupNorms.has(a.norm)
+          );
+          if (nextInSlot) {
+            const bRec = lookupMaddenPlayer(teamAbbr, nextInSlot.name, item.bucket);
+            backup = bRec || { name: nextInSlot.name, norm: nextInSlot.norm, team: teamAbbr, bucket: item.bucket, ovr: null };
+          }
+        }
+
+        // Fallback to highest healthy player in same bucket from Madden CSV if depth chart slot had no backup
+        if (!backup) {
+          backup = roster.find(p =>
+            p.bucket === item.bucket &&
+            !injuredNorms.has(p.norm) &&
+            !usedBackupNorms.has(p.norm)
+          ) || null;
+        }
+
+        if (backup) usedBackupNorms.add(backup.norm);
+
+        const starterOvr = item.player.ovr;
+        const backupOvr = backup ? backup.ovr : null;
+        const delta = (starterOvr !== null && backupOvr !== null) ? (backupOvr - starterOvr) : null;
+
+        return {
+          ...item,
+          backup,
+          delta,
+          returnGain: 0
+        };
+      });
+
+      // Keep QBs unconditionally (even if delta is 0 or unrated), plus any starter with negative OVR downgrade or returning starter
+      const impactful = evaluated.filter(e =>
+        e.isQb || e.isReturningNextWeek || (e.delta !== null && e.delta < 0)
+      );
+
+      // Cluster detection: requires 2+ starting-slot linemen down with net negative OVR drop
+      const absentPlayers = impactful.filter(e => !e.isReturningNextWeek);
+      const olGroup = absentPlayers.filter(e => OL_BUCKETS.has(e.bucket));
+      const dlGroup = absentPlayers.filter(e => DL_BUCKETS.has(e.bucket));
+
+      const olTotalDelta = olGroup.reduce((sum, e) => sum + (e.delta || 0), 0);
+      const dlTotalDelta = dlGroup.reduce((sum, e) => sum + (e.delta || 0), 0);
+
+      const olClusterActive = olGroup.length >= 2 && olTotalDelta < 0 && olGroup.some(e => (e.player.ovr || 0) >= minOvr);
+      const dlClusterActive = dlGroup.length >= 2 && dlTotalDelta < 0 && dlGroup.some(e => (e.player.ovr || 0) >= minOvr);
+
+      const clusters = [];
+      if (olClusterActive) {
+        clusters.push({ unit: "OL", count: olGroup.length, totalDelta: olTotalDelta });
+      }
+      if (dlClusterActive) {
+        clusters.push({ unit: "DL", count: dlGroup.length, totalDelta: dlTotalDelta });
+      }
+
+      // Apply Min Starter OVR filter (EXCLUDING QBs and active OL/DL clusters)
+      const visible = impactful.filter(e => {
+        if (e.isQb) return true;
+        if (!e.isReturningNextWeek && olClusterActive && OL_BUCKETS.has(e.bucket)) return true;
+        if (!e.isReturningNextWeek && dlClusterActive && DL_BUCKETS.has(e.bucket)) return true;
+        return (e.player.ovr || 0) >= minOvr;
+      });
+
+      const totalDrop = visible
+        .filter(e => !e.isReturningNextWeek && e.delta !== null && e.delta < 0)
+        .reduce((sum, e) => sum + e.delta, 0);
+      const totalReturnGain = visible
+        .filter(e => e.isReturningNextWeek)
+        .reduce((sum, e) => sum + (e.returnGain || 0), 0);
+      const hasEliteReturn = visible.some(e => e.isReturningNextWeek && (e.player.ovr || 0) >= 90);
+
+      return { teamAbbr, clusters, items: visible, totalDrop, totalReturnGain, hasEliteReturn };
+    }
+
+    function statusBadgeClass(item) {
+      if (item.isInGameExit) return "badge-exit";
+      if (item.isIr) return "badge-ir";
+      const s = (item.status || "").toLowerCase();
+      if (s.includes("out")) return "badge-out";
+      if (s.includes("doubt")) return "badge-doubt";
+      return "badge-quest";
+    }
+
+    function renderInjuryRow(item, teamPrefix = "") {
+      const sOvr = item.player.ovr !== null ? item.player.ovr : "?";
+
+      if (item.isReturningNextWeek) {
+        const isElite = (item.player.ovr || 0) >= 90;
+        const rowCls = isElite ? "row-return-elite" : "row-return-std";
+        const badgeCls = isElite ? "badge-ret-elite" : "badge-ret-std";
+        const noteCls = isElite ? "ret-note-elite" : "ret-note-std";
+        const retStr = item.returnDateObj ? formatShortDate(item.returnDateObj) : "Next Week";
+        const badgeText = isElite ? `★ 90+ RETURN • ${retStr}` : `RETURNING • ${retStr}`;
+        const gainStr = item.returnGain > 0 ? ` (+${item.returnGain} OVR boost)` : "";
+
+        return `
+          <div class="injury-row ${rowCls}">
+            <div class="row-main">
+              <div class="player-info">
+                <span class="pos-tag">${teamPrefix}${item.bucket}</span>
+                ${item.player.name} <span class="ovr-num">(${sOvr})</span>
+              </div>
+              <span class="badge ${badgeCls}">${badgeText}</span>
+            </div>
+            <div class="ovr-compare">
+              <span class="${noteCls}">Projected back in lineup${gainStr}</span>
+            </div>
+            ${item.comment ? `<div class="comment-text">${item.comment}</div>` : ""}
+          </div>
+        `;
+      }
+
+      const bName = item.backup ? item.backup.name : "No healthy backup listed";
+      const bOvr = (item.backup && item.backup.ovr !== null) ? item.backup.ovr : "?";
+
+      let deltaHtml = "";
+      if (item.delta !== null) {
+        const cls = item.delta <= -8 ? "delta-bad" : (item.delta <= -4 ? "delta-mid" : "delta-ok");
+        const sign = item.delta > 0 ? "+" : "";
+        deltaHtml = `<span class="${cls}">(${sign}${item.delta} OVR)</span>`;
+      }
+
+      const label = item.isInGameExit ? "IN-GAME EXIT" : (item.isIr ? "NEW IR" : (item.status || "INJ"));
+      const badgeCls = statusBadgeClass(item);
+
+      return `
+        <div class="injury-row">
+          <div class="row-main">
+            <div class="player-info">
+              <span class="pos-tag">${teamPrefix}${item.bucket}</span>
+              ${item.player.name} <span class="ovr-num">(${sOvr})</span>
+            </div>
+            <span class="badge ${badgeCls}">${label}</span>
+          </div>
+          <div class="ovr-compare">
+            Next up: <span class="ovr-num">${bName} (${bOvr})</span> ${deltaHtml}
+          </div>
+          ${item.comment ? `<div class="comment-text">${item.comment}</div>` : ""}
+        </div>
+      `;
+    }
+
+    function renderTeamColumn(teamName, teamAbbr, isNextWeekView, activeBoard) {
+      const data = evaluateTeamInjuries(teamAbbr, isNextWeekView, activeBoard);
+
+      const dropCls = data.totalDrop <= -10 ? "net-bad" : (data.totalDrop < 0 ? "net-mid" : "net-zero");
+      const dropText = data.totalDrop < 0 ? `${data.totalDrop} OVR` : "0 OVR";
+
+      let retPillHtml = "";
+      if (isNextWeekView && data.totalReturnGain > 0) {
+        const retCls = data.hasEliteReturn ? "net-ret-elite" : "net-ret";
+        retPillHtml = `<span class="net-pill ${retCls}">+${data.totalReturnGain} RET</span>`;
+      }
+
+      const clusterHtml = data.clusters.map(c =>
+        `<div class="cluster-box">⚠️ ${c.unit} CLUSTER (${c.count} STARTERS): ${c.totalDelta} Combined OVR</div>`
+      ).join("");
+
+      const rowsHtml = data.items.length > 0
+        ? data.items.map(i => renderInjuryRow(i)).join("")
+        : `<div class="clean-msg">No line-moving starter injuries.</div>`;
+
+      return `
+        <div class="team-col">
+          <div class="team-name">
+            <span>${teamName}</span>
+            <div class="team-pills">
+              ${retPillHtml}
+              <span class="net-pill ${dropCls}">${dropText}</span>
+            </div>
+          </div>
+          ${clusterHtml}
+          ${rowsHtml}
+        </div>
+      `;
+    }
+
+    function renderDashboard() {
+      savePrefs();
+      const slateChoice = document.getElementById("slateSelect").value;
+      const viewChoice = document.getElementById("viewSelect").value;
+      const container = document.getElementById("contentArea");
+
+      const useNext = slateChoice === "next" || (slateChoice === "auto" && isPastSunday6pmET());
+      const board = (useNext && nextScoreboard) ? nextScoreboard : currentScoreboard;
+
+      if (!board || !board.events) {
+        container.innerHTML = `<div class="matchup-card">No schedule data available.</div>`;
+        return;
+      }
+
+      const upcomingEvents = board.events.filter(ev => {
+        const comp = ev.competitions?.[0];
+        return comp && comp.status?.type?.completed !== true;
+      });
+
+      const weekNum = board.week?.number || "";
+      const slateLabel = useNext ? `Week ${weekNum} Lookahead` : `Week ${weekNum} Remaining Slate`;
+      document.getElementById("statusLine").textContent =
+        `Showing ${slateLabel} (${upcomingEvents.length} games) • Updated ${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+
+      if (viewChoice === "matchups") {
+        container.innerHTML = upcomingEvents.map(ev => {
+          const comp = ev.competitions[0];
+          const away = comp.competitors.find(c => c.homeAway === "away");
+          const home = comp.competitors.find(c => c.homeAway === "home");
+          if (!away || !home) return "";
+
+          const kickoff = new Date(ev.date).toLocaleString([], {
+            weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit"
+          });
+
+          return `
+            <div class="matchup-card">
+              <div class="matchup-header">
+                <div class="matchup-title">${away.team.displayName} @ ${home.team.displayName}</div>
+                <div class="matchup-time">${kickoff}</div>
+              </div>
+              <div class="teams-grid">
+                ${renderTeamColumn(away.team.displayName, normTeam(away.team.abbreviation), useNext, board)}
+                ${renderTeamColumn(home.team.displayName, normTeam(home.team.abbreviation), useNext, board)}
+              </div>
+            </div>
+          `;
+        }).join("");
+      } else {
+        const activeTeams = new Set();
+        upcomingEvents.forEach(ev => {
+          ev.competitions?.[0]?.competitors?.forEach(c => activeTeams.add(normTeam(c.team.abbreviation)));
+        });
+
+        const allItems = [];
+        activeTeams.forEach(abbr => {
+          const evalData = evaluateTeamInjuries(abbr, useNext, board);
+          evalData.items.forEach(item => allItems.push({ ...item, teamAbbr: abbr }));
+        });
+
+        allItems.sort((a, b) => {
+          if (a.isReturningNextWeek !== b.isReturningNextWeek) {
+            return a.isReturningNextWeek ? 1 : -1;
+          }
+          if (a.isReturningNextWeek && b.isReturningNextWeek) {
+            return (b.player.ovr || 0) - (a.player.ovr || 0);
+          }
+          if (a.isQb !== b.isQb) return a.isQb ? -1 : 1;
+          return (a.delta ?? 0) - (b.delta ?? 0);
+        });
+
+        container.innerHTML = `
+          <div class="matchup-card">
+            <div class="matchup-header">
+              <div class="matchup-title">Biggest OVR Drop-Offs (${slateLabel})</div>
+              <div class="matchup-time">${allItems.length} starters</div>
+            </div>
+            ${allItems.length > 0
+              ? allItems.map(i => renderInjuryRow(i, `${i.teamAbbr} • `)).join("")
+              : `<div class="clean-msg">No line-moving starter injuries.</div>`}
+          </div>
+        `;
+      }
+    }
+
+    async function fetchAllDepthCharts(teamAbbrs) {
+      espnDepthByTeam = {};
+      const promises = Array.from(teamAbbrs).map(abbr => {
+        const slug = abbr.toLowerCase();
+        return fetch(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/${slug}/depthchart`)
+          .then(r => (r.ok ? r.json() : null))
+          .then(data => {
+            if (!data || !Array.isArray(data.items)) return;
+            const slots = [];
+            data.items.forEach(formation => {
+              const positions = formation.positions || {};
+              Object.entries(positions).forEach(([posKey, posObj]) => {
+                const posAbbr = posObj.position?.abbreviation || posKey;
+                const bucket = mapBucket(posAbbr);
+                if (!bucket) return;
+                const rawAthletes = posObj.athletes || [];
+                const chain = rawAthletes
+                  .map(a => {
+                    const name = a.displayName || a.athlete?.displayName || a.fullName || "";
+                    return { name, norm: normName(name) };
+                  })
+                  .filter(a => a.name);
+                if (chain.length > 0) {
+                  slots.push({ posKey: posAbbr, bucket, chain });
+                }
+              });
+            });
+            espnDepthByTeam[abbr] = { slots };
+          })
+          .catch(() => {});
+      });
+
+      await Promise.all(promises);
+    }
+
+    async function enrichGameInactives(scoreboard) {
+      gameMetaByTeam = {};
+      if (!scoreboard || !scoreboard.events) return;
+
+      const now = new Date();
+      const summaryPromises = [];
+
+      for (const ev of scoreboard.events) {
+        const comp = ev.competitions?.[0];
+        if (!comp) continue;
+        const kickoff = new Date(ev.date);
+        const state = comp.status?.type?.state || "pre";
+        const completed = comp.status?.type?.completed === true;
+        const hasStartedOrCompleted = state === "in" || state === "post" || completed || kickoff <= now;
+
+        const teams = (comp.competitors || []).map(c => normTeam(c.team?.abbreviation));
+        teams.forEach(abbr => {
+          if (abbr) {
+            gameMetaByTeam[abbr] = {
+              kickoff,
+              completed,
+              hasStartedOrCompleted,
+              hasOfficialInactives: false,
+              inactiveNorms: new Set()
+            };
+          }
+        });
+
+        const twoHoursBefore = new Date(kickoff.getTime() - 2 * 60 * 60 * 1000);
+        if (now >= twoHoursBefore && ev.id) {
+          summaryPromises.push(
+            fetch(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=${ev.id}`)
+              .then(r => (r.ok ? r.json() : null))
+              .then(summary => {
+                if (!summary) return;
+                const inactiveBlocks = summary.boxscore?.inactives || summary.inactives || [];
+                inactiveBlocks.forEach(block => {
+                  const abbr = normTeam(block.team?.abbreviation);
+                  const athletes = block.athletes || block.inactives || [];
+                  if (abbr && gameMetaByTeam[abbr] && Array.isArray(athletes) && athletes.length > 0) {
+                    gameMetaByTeam[abbr].hasOfficialInactives = true;
+                    athletes.forEach(a => {
+                      const name = a.displayName || a.athlete?.displayName || a.fullName || "";
+                      if (name) gameMetaByTeam[abbr].inactiveNorms.add(normName(name));
+                    });
+                  }
+                });
+              })
+              .catch(() => {})
+          );
+        }
+      }
+
+      if (summaryPromises.length > 0) {
+        await Promise.all(summaryPromises);
+      }
+    }
+
+    async function loadAllData() {
+      document.getElementById("statusLine").textContent = "Fetching Madden CSV, live depth charts & ESPN feeds...";
+      try {
+        const [csvRes, injRes, curScoreRes] = await Promise.all([
+          fetch("madden27.csv"),
+          fetch("https://site.api.espn.com/apis/site/v2/sports/football/nfl/injuries"),
+          fetch("https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard")
+        ]);
+
+        if (!csvRes.ok) throw new Error("Could not load madden27.csv");
+        maddenByTeam = parseCSV(await csvRes.text());
+
+        const injData = await injRes.json();
+        espnInjuriesByTeam = {};
+        (injData.injuries || []).forEach(teamBlock => {
+          const abbr = normTeam(teamBlock.displayName);
+          espnInjuriesByTeam[abbr] = (teamBlock.injuries || []).map(entry => ({
+            name: entry.athlete?.displayName || "",
+            pos: entry.athlete?.position?.abbreviation || "",
+            status: entry.status || "",
+            date: entry.date || "",
+            returnDate: entry.details?.returnDate || "",
+            comment: entry.shortComment || entry.longComment || ""
+          }));
+        });
+
+        currentScoreboard = await curScoreRes.json();
+        const curWeek = currentScoreboard.week?.number;
+        const seasonType = currentScoreboard.season?.type || 2;
+
+        const nextPromise = curWeek
+          ? fetch(`https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?seasontype=${seasonType}&week=${curWeek + 1}`)
+              .then(r => (r.ok ? r.json() : null))
+          : Promise.resolve(null);
+
+        const [nextBoard] = await Promise.all([
+          nextPromise,
+          enrichGameInactives(currentScoreboard)
+        ]);
+        nextScoreboard = nextBoard;
+
+        // Collect all teams across current & next scoreboards to pull live depth charts
+        const allTeams = new Set();
+        [currentScoreboard, nextScoreboard].forEach(b => {
+          b?.events?.forEach(ev => {
+            ev.competitions?.[0]?.competitors?.forEach(c => {
+              const abbr = normTeam(c.team?.abbreviation);
+              if (abbr) allTeams.add(abbr);
+            });
+          });
+        });
+
+        await fetchAllDepthCharts(allTeams);
+        renderDashboard();
+      } catch (err) {
+        document.getElementById("statusLine").textContent = "Error: " + err.message;
+      }
+    }
+
+    loadSavedPrefs();
+    document.getElementById("slateSelect").addEventListener("change", renderDashboard);
+    document.getElementById("viewSelect").addEventListener("change", renderDashboard);
+    document.getElementById("minOvrInput").addEventListener("change", renderDashboard);
+    document.getElementById("showOldIr").addEventListener("change", renderDashboard);
+    document.getElementById("reloadBtn").addEventListener("click", loadAllData);
+
+    loadAllData();
+  </script>
+</body>
+</html>
