@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Madden 27 Roster Guess</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --border: #334155;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --green: #22c55e;
+      --red: #ef4444;
+      --amber: #f59e0b;
+    }
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      padding: 20px 16px;
+    }
+    .container {
+      width: 100%;
+      max-width: 560px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px;
+      margin-bottom: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+    h1 { margin: 0 0 6px; font-size: 1.45rem; }
+    .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 16px; }
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+      font-size: 0.9rem;
+    }
+    .control-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+    select, input[type="text"], input[type="number"], button {
+      background: #0f172a;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 0.95rem;
+    }
+    input[type="number"] {
+      width: 68px;
+      text-align: center;
+      font-weight: 600;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 1rem;
+      margin-bottom: 12px;
+    }
+    input[type="text"]:focus, input[type="number"]:focus, select:focus {
+      outline: 2px solid var(--accent);
+      border-color: transparent;
+    }
+    button {
+      background: var(--accent);
+      border: none;
+      font-weight: 600;
+      padding: 11px 16px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    button:hover { background: var(--accent-hover); }
+    button.secondary { background: #334155; }
+    button.secondary:hover { background: #475569; }
+    .scoreboard {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      background: #0f172a;
+      padding: 10px 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      text-align: center;
+      font-size: 0.85rem;
+    }
+    .scoreboard span { display: block; color: var(--muted); font-size: 0.72rem; text-transform: uppercase; }
+    .scoreboard strong { font-size: 1rem; }
+    .recap-banner {
+      display: none;
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid var(--amber);
+      color: #fcd34d;
+      padding: 10px 14px;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-bottom: 14px;
+    }
+    .player-prompt {
+      text-align: center;
+      padding: 14px 0 22px;
+    }
+    .player-label { color: var(--muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+    .player-name { font-size: 2.05rem; font-weight: 800; margin: 8px 0 0; }
+    .result-box {
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: 8px;
+      display: none;
+    }
+    .result-box.correct { background: rgba(34, 197, 94, 0.15); border: 1px solid var(--green); }
+    .result-box.wrong { background: rgba(239, 68, 68, 0.15); border: 1px solid var(--red); }
+    .result-title { font-weight: 700; font-size: 1.05rem; margin-bottom: 8px; }
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+      text-align: center;
+    }
+    .stat-pill {
+      background: #0f172a;
+      padding: 10px 8px;
+      border-radius: 6px;
+    }
+    .stat-pill span { display: block; font-size: 0.75rem; color: var(--muted); }
+    .stat-pill strong { font-size: 1rem; }
+    .btn-row { display: flex; gap: 10px; }
+    .btn-row button { flex: 1; }
+    #statusMsg { text-align: center; color: var(--muted); padding: 20px 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Madden 27 Roster Guess</h1>
+      <div class="subtitle">Guess the NFL team from the top-rated players on each roster.</div>
+
+      <div id="statusMsg">Loading madden27.csv...</div>
+
+      <div id="gameArea" style="display:none;">
+        <div class="controls">
+          <div class="control-row">
+            <label style="display:flex; align-items:center; gap:6px;">
+              Top
+              <input type="number" id="topNInput" min="1" max="99" value="10" />
+              / team
+            </label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+              <input type="checkbox" id="excludeQB" checked />
+              Exclude QBs
+            </label>
+            <button class="secondary" id="resetPoolBtn" style="padding:6px 12px; font-size:0.85rem; margin-left:auto;">Reset</button>
+          </div>
+          <div class="control-row">
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+              <input type="checkbox" id="recapEnabled" checked />
+              Recap Mode after
+            </label>
+            <select id="recapThreshold" style="padding:6px 10px; font-size:0.9rem;">
+              <option value="5">5 misses</option>
+              <option value="10">10 misses</option>
+              <option value="15">15 misses</option>
+              <option value="20" selected>20 misses</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="scoreboard">
+          <div><span>Score</span><strong id="scoreText">0 / 0</strong></div>
+          <div><span>Streak</span><strong id="streakText">0</strong></div>
+          <div><span>Pool Left</span><strong id="remainingText">0</strong></div>
+          <div><span>Miss Queue</span><strong id="missQueueText">0 / 20</strong></div>
+        </div>
+
+        <div class="recap-banner" id="recapBanner">
+          RECAP MODE — Clear all missed players to continue (<span id="recapLeftText">0</span> left)
+        </div>
+
+        <div class="player-prompt">
+          <div class="player-label">Which team does he play for?</div>
+          <div class="player-name" id="playerNameDisplay">—</div>
+        </div>
+
+        <form id="guessForm" autocomplete="off">
+          <input type="text" id="teamInput" list="nflTeams" placeholder="Type team name, city, or abbr (e.g. Ravens, BAL)..." required />
+          <datalist id="nflTeams"></datalist>
+          <div class="btn-row">
+            <button type="submit" id="submitBtn">Submit Guess</button>
+            <button type="button" class="secondary" id="nextBtn" style="display:none;">Next Player →</button>
+          </div>
+        </form>
+
+        <div class="result-box" id="resultBox">
+          <div class="result-title" id="resultTitle"></div>
+          <div class="stat-grid">
+            <div class="stat-pill"><span>Team</span><strong id="revealTeam">—</strong></div>
+            <div class="stat-pill"><span>Position</span><strong id="revealPos">—</strong></div>
+            <div class="stat-pill"><span>Madden OVR</span><strong id="revealOvr">—</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const TEAM_ALIASES = {
+      "arizona cardinals": ["ari", "arizona", "cardinals", "cards"],
+      "atlanta falcons": ["atl", "atlanta", "falcons"],
+      "baltimore ravens": ["bal", "baltimore", "ravens"],
+      "buffalo bills": ["buf", "buffalo", "bills"],
+      "carolina panthers": ["car", "carolina", "panthers"],
+      "chicago bears": ["chi", "chicago", "bears"],
+      "cincinnati bengals": ["cin", "cincy", "cincinnati", "bengals"],
+      "cleveland browns": ["cle", "cleveland", "browns"],
+      "dallas cowboys": ["dal", "dallas", "cowboys"],
+      "denver broncos": ["den", "denver", "broncos"],
+      "detroit lions": ["det", "detroit", "lions"],
+      "green bay packers": ["gb", "gnb", "green bay", "packers", "pack"],
+      "houston texans": ["hou", "houston", "texans"],
+      "indianapolis colts": ["ind", "indy", "indianapolis", "colts"],
+      "jacksonville jaguars": ["jax", "jac", "jacksonville", "jaguars", "jags"],
+      "kansas city chiefs": ["kc", "kan", "kansas city", "chiefs"],
+      "las vegas raiders": ["lv", "lvr", "oak", "las vegas", "vegas", "raiders"],
+      "los angeles chargers": ["lac", "sd", "chargers", "la chargers"],
+      "los angeles rams": ["lar", "la", "stl", "rams", "la rams"],
+      "miami dolphins": ["mia", "miami", "dolphins", "fins"],
+      "minnesota vikings": ["min", "minnesota", "vikings", "vikes"],
+      "new england patriots": ["ne", "nep", "new england", "patriots", "pats"],
+      "new orleans saints": ["no", "nor", "new orleans", "saints"],
+      "new york giants": ["nyg", "giants", "ny giants"],
+      "new york jets": ["nyj", "jets", "ny jets"],
+      "philadelphia eagles": ["phi", "philly", "philadelphia", "eagles"],
+      "pittsburgh steelers": ["pit", "pittsburgh", "steelers"],
+      "san francisco 49ers": ["sf", "sfo", "san francisco", "san fran", "49ers", "niners"],
+      "seattle seahawks": ["sea", "seattle", "seahawks", "hawks"],
+      "tampa bay buccaneers": ["tb", "tam", "tampa", "tampa bay", "buccaneers", "bucs"],
+      "tennessee titans": ["ten", "tennessee", "titans"],
+      "washington commanders": ["was", "wsh", "washington", "commanders", "commies"]
+    };
+
+    const POS_MAP = {
+      "LEDG": "DE",
+      "REDG": "DE",
+      "WILL": "OLB",
+      "SAM": "OLB",
+      "MIKE": "MLB"
+    };
+
+    let allPlayers = [];
+    let activePool = [];
+    let missedBuffer = [];
+    let recapPool = [];
+    let isRecapMode = false;
+    let currentPlayer = null;
+    let score = 0;
+    let attempts = 0;
+    let streak = 0;
+    let answered = false;
+
+    const datalist = document.getElementById("nflTeams");
+    Object.keys(TEAM_ALIASES).forEach(team => {
+      const opt = document.createElement("option");
+      opt.value = team.replace(/\b\w/g, c => c.toUpperCase()).replace("49Ers", "49ers");
+      datalist.appendChild(opt);
+    });
+
+    function mapPosition(rawPos) {
+      const upper = rawPos.trim().toUpperCase();
+      return POS_MAP[upper] || upper;
+    }
+
+    function parseCSV(text) {
+      const lines = text.trim().split(/\r?\n/);
+      if (lines.length < 2) return [];
+      const delimiter = lines[0].includes("\t") ? "\t" : ",";
+      const headers = lines[0].split(delimiter).map(h => h.trim().replace(/^"|"$/g, "").toLowerCase());
+
+      const idxFirst = headers.findIndex(h => h === "first name" || h === "firstname");
+      const idxLast = headers.findIndex(h => h === "last name" || h === "lastname");
+      const idxPlayer = headers.findIndex(h => h === "player" || h === "name");
+      const idxPosId = headers.findIndex(h => h === "position id" || h === "positionid");
+      const idxPosFallback = headers.findIndex(h => h === "position" || h === "pos");
+      const idxTeam = headers.findIndex(h => h === "team");
+      const idxOvr = headers.findIndex(h => h === "overall" || h === "ovr");
+
+      const posCol = idxPosId !== -1 ? idxPosId : idxPosFallback;
+
+      const parsed = [];
+      for (let i = 1; i < lines.length; i++) {
+        const cols = lines[i].split(delimiter).map(c => c.trim().replace(/^"|"$/g, ""));
+        if (cols.length < 4) continue;
+
+        const name = idxPlayer !== -1
+          ? cols[idxPlayer]
+          : `${cols[idxFirst] || ""} ${cols[idxLast] || ""}`.trim();
+        const team = cols[idxTeam] || "";
+        const rawPos = cols[posCol] || "";
+        const pos = mapPosition(rawPos);
+        const ovr = parseInt(cols[idxOvr], 10);
+
+        if (!name || !team || isNaN(ovr)) continue;
+        if (team.toLowerCase() === "free agent" || team.toLowerCase() === "fa") continue;
+
+        parsed.push({ name, team, pos, ovr });
+      }
+      return parsed;
+    }
+
+    function normalizeTeam(raw) {
+      const clean = raw.trim().toLowerCase();
+      for (const [canonical, aliases] of Object.entries(TEAM_ALIASES)) {
+        if (canonical === clean || aliases.includes(clean)) return canonical;
+      }
+      return clean;
+    }
+
+    function buildPool() {
+      const topN = Math.max(1, parseInt(document.getElementById("topNInput").value, 10) || 10);
+      const excludeQB = document.getElementById("excludeQB").checked;
+
+      const byTeam = {};
+      allPlayers.forEach(p => {
+        if (excludeQB && p.pos === "QB") return;
+        if (!byTeam[p.team]) byTeam[p.team] = [];
+        byTeam[p.team].push(p);
+      });
+
+      activePool = [];
+      Object.values(byTeam).forEach(roster => {
+        roster.sort((a, b) => b.ovr - a.ovr);
+        activePool.push(...roster.slice(0, topN));
+      });
+
+      missedBuffer = [];
+      recapPool = [];
+      isRecapMode = false;
+      score = 0;
+      attempts = 0;
+      streak = 0;
+      updateUIState();
+      nextRound();
+    }
+
+    function updateUIState() {
+      const recapOn = document.getElementById("recapEnabled").checked;
+      const threshold = parseInt(document.getElementById("recapThreshold").value, 10);
+
+      document.getElementById("scoreText").textContent = `${score} / ${attempts}`;
+      document.getElementById("streakText").textContent = streak;
+      document.getElementById("remainingText").textContent = activePool.length;
+      document.getElementById("missQueueText").textContent = recapOn
+        ? `${missedBuffer.length} / ${threshold}`
+        : `${missedBuffer.length}`;
+
+      const banner = document.getElementById("recapBanner");
+      if (isRecapMode) {
+        const totalRecapLeft = recapPool.length + (answered ? 0 : 1);
+        banner.style.display = "block";
+        document.getElementById("recapLeftText").textContent = totalRecapLeft;
+      } else {
+        banner.style.display = "none";
+      }
+    }
+
+    function nextRound() {
+      answered = false;
+      document.getElementById("resultBox").style.display = "none";
+      document.getElementById("submitBtn").style.display = "block";
+      document.getElementById("nextBtn").style.display = "none";
+      const input = document.getElementById("teamInput");
+      input.value = "";
+      input.disabled = false;
+      input.focus();
+
+      const recapOn = document.getElementById("recapEnabled").checked;
+      const threshold = parseInt(document.getElementById("recapThreshold").value, 10);
+
+      // Check if we should enter Recap Mode
+      if (!isRecapMode && recapOn && (missedBuffer.length >= threshold || (activePool.length === 0 && missedBuffer.length > 0))) {
+        isRecapMode = true;
+        recapPool = [...missedBuffer];
+        missedBuffer = [];
+      }
+
+      // Check if we finished clearing Recap Mode
+      if (isRecapMode && recapPool.length === 0) {
+        isRecapMode = false;
+      }
+
+      if (isRecapMode) {
+        const randIdx = Math.floor(Math.random() * recapPool.length);
+        currentPlayer = recapPool.splice(randIdx, 1)[0];
+        document.getElementById("playerNameDisplay").textContent = currentPlayer.name;
+        updateUIState();
+        return;
+      }
+
+      if (activePool.length === 0) {
+        currentPlayer = null;
+        document.getElementById("playerNameDisplay").textContent = "Pool Complete!";
+        document.getElementById("submitBtn").style.display = "none";
+        updateUIState();
+        return;
+      }
+
+      const randIdx = Math.floor(Math.random() * activePool.length);
+      currentPlayer = activePool.splice(randIdx, 1)[0];
+      document.getElementById("playerNameDisplay").textContent = currentPlayer.name;
+      updateUIState();
+    }
+
+    document.getElementById("guessForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (answered || !currentPlayer) return;
+
+      const userGuess = normalizeTeam(document.getElementById("teamInput").value);
+      const actualTeam = normalizeTeam(currentPlayer.team);
+      const isCorrect = userGuess === actualTeam;
+
+      answered = true;
+      attempts++;
+
+      if (isCorrect) {
+        score++;
+        streak++;
+      } else {
+        streak = 0;
+        if (isRecapMode) {
+          // Put right back into the active recap batch until guessed right
+          recapPool.push(currentPlayer);
+        } else {
+          missedBuffer.push(currentPlayer);
+        }
+      }
+
+      const resBox = document.getElementById("resultBox");
+      resBox.className = "result-box " + (isCorrect ? "correct" : "wrong");
+      resBox.style.display = "block";
+
+      document.getElementById("resultTitle").textContent = isCorrect
+        ? "Correct!"
+        : `Not quite — it's ${currentPlayer.team}`;
+      document.getElementById("revealTeam").textContent = currentPlayer.team;
+      document.getElementById("revealPos").textContent = currentPlayer.pos;
+      document.getElementById("revealOvr").textContent = currentPlayer.ovr;
+
+      document.getElementById("teamInput").disabled = true;
+      document.getElementById("submitBtn").style.display = "none";
+      document.getElementById("nextBtn").style.display = "block";
+      document.getElementById("nextBtn").focus();
+      updateUIState();
+    });
+
+    document.getElementById("nextBtn").addEventListener("click", nextRound);
+    document.getElementById("topNInput").addEventListener("change", buildPool);
+    document.getElementById("excludeQB").addEventListener("change", buildPool);
+    document.getElementById("resetPoolBtn").addEventListener("click", buildPool);
+    document.getElementById("recapEnabled").addEventListener("change", () => {
+      if (!document.getElementById("recapEnabled").checked && isRecapMode) {
+        // Release remaining recap items back to missedBuffer if turned off mid-recap
+        missedBuffer.push(...recapPool);
+        recapPool = [];
+        isRecapMode = false;
+      }
+      updateUIState();
+    });
+    document.getElementById("recapThreshold").addEventListener("change", updateUIState);
+
+    fetch("madden27.csv")
+      .then(res => {
+        if (!res.ok) throw new Error("Failed to load madden27.csv");
+        return res.text();
+      })
+      .then(text => {
+        allPlayers = parseCSV(text);
+        if (allPlayers.length === 0) throw new Error("No players found in CSV");
+        document.getElementById("statusMsg").style.display = "none";
+        document.getElementById("gameArea").style.display = "block";
+        buildPool();
+      })
+      .catch(err => {
+        document.getElementById("statusMsg").textContent = "Error: " + err.message;
+      });
+  </script>
+</body>
+</html>
