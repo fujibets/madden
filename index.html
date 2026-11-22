@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Madden 27 Roster Trivia</title>
+  <style>
+    :root {
+      --bg: #0b1120;
+      --card: #131c31;
+      --surface: #1b2640;
+      --border: #2a3958;
+      --text: #f1f5f9;
+      --muted: #8b9bb4;
+      --accent: #3b82f6;
+      --accent-soft: rgba(59, 130, 246, 0.16);
+      --green: #22c55e;
+      --green-soft: rgba(34, 197, 94, 0.14);
+      --red: #ef4444;
+      --red-soft: rgba(239, 68, 68, 0.14);
+      --amber: #f59e0b;
+      --amber-soft: rgba(245, 158, 11, 0.16);
+    }
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      padding: 12px;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      width: 100%;
+      max-width: 600px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    }
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .title-wrap h1 {
+      margin: 0;
+      font-size: 1.2rem;
+      letter-spacing: -0.01em;
+    }
+    .nav-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: inline-block;
+      margin-top: 2px;
+    }
+    .score-pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 6px 12px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+    .score-main {
+      font-size: 0.98rem;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+    .score-pct {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--green);
+      margin-top: 1px;
+    }
+    .segmented-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .seg-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 8px;
+      padding: 7px 6px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s ease;
+    }
+    .seg-btn.active {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: #93c5fd;
+    }
+    .pool-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    select, input[type="number"], input[type="text"] {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-size: 0.85rem;
+      outline: none;
+    }
+    select:focus, input:focus {
+      border-color: var(--accent);
+    }
+    input[type="number"].tiny-num {
+      width: 58px;
+      text-align: center;
+      font-weight: 700;
+      padding: 7px 4px;
+    }
+    .qb-toggle {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .qb-toggle.active {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: #93c5fd;
+    }
+    .utility-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+    .btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 9px 14px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn:active { transform: scale(0.99); }
+    .btn-sm {
+      padding: 6px 10px;
+      font-size: 0.78rem;
+      border-radius: 7px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-ghost {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .btn-amber {
+      background: var(--amber-soft);
+      border: 1px solid var(--amber);
+      color: #fcd34d;
+    }
+    .btn-muted {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .btn-muted:hover {
+      border-color: var(--red);
+      color: #fca5a5;
+    }
+    .drill-banner {
+      background: var(--amber-soft);
+      border: 1px solid var(--amber);
+      color: #fde68a;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .player-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .counter-tag {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .player-name {
+      font-size: 1.55rem;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      margin-top: 2px;
+      line-height: 1.15;
+    }
+    .excl-pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 20px;
+      padding: 5px 10px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .excl-pill:hover {
+      border-color: var(--amber);
+      color: #fcd34d;
+    }
+    .input-block {
+      margin-bottom: 14px;
+    }
+    .field-label {
+      display: block;
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+    }
+    .text-input-lg {
+      width: 100%;
+      padding: 10px 12px !important;
+      font-size: 1rem !important;
+      font-weight: 600;
+    }
+    .pos-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+    }
+    .pos-chip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 8px 4px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      text-align: center;
+      cursor: pointer;
+    }
+    .pos-chip.selected {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .quiz-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .quiz-actions .btn {
+      flex: 1;
+    }
+    .feedback-box {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .feedback-box.win {
+      background: var(--green-soft);
+      border-color: rgba(34, 197, 94, 0.4);
+    }
+    .feedback-box.loss {
+      background: var(--red-soft);
+      border-color: rgba(239, 68, 68, 0.4);
+    }
+    .fb-header {
+      font-weight: 800;
+      font-size: 0.98rem;
+      margin-bottom: 6px;
+    }
+    .win .fb-header { color: #86efac; }
+    .loss .fb-header { color: #fca5a5; }
+    .fb-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.88rem;
+      margin-top: 4px;
+    }
+    .fb-row.ref-row {
+      color: var(--muted);
+    }
+    .icon-ok { color: var(--green); font-weight: 900; }
+    .icon-bad { color: var(--red); font-weight: 900; }
+    .icon-ref { color: var(--muted); font-weight: 900; }
+    .muted-note { color: var(--muted); font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="header-top">
+        <div class="title-wrap">
+          <h1>Madden 27 Roster Trivia</h1>
+          <a href="injuries.html" class="nav-link">NFL Injury Impact →</a>
+        </div>
+        <div class="score-pill">
+          <div class="score-main" id="scoreText">0 / 0</div>
+          <div class="score-pct" id="pctText">—</div>
+        </div>
+      </div>
+
+      <div class="segmented-row">
+        <button type="button" class="seg-btn active" id="toggleTeam">✓ Team</button>
+        <button type="button" class="seg-btn" id="togglePos">Position</button>
+        <button type="button" class="seg-btn" id="toggleOvr">Rating (±5)</button>
+      </div>
+
+      <div class="pool-row">
+        <select id="poolModeSelect" aria-label="Pool Mode">
+          <option value="team">Top X by Team</option>
+          <option value="league">Top X League-Wide</option>
+        </select>
+        <input type="number" id="topXInput" class="tiny-num" min="1" max="500" value="3" aria-label="Top X Count" />
+        <button type="button" class="qb-toggle active" id="toggleExclQb">✓ No QBs</button>
+      </div>
+
+      <div class="utility-row">
+        <button type="button" class="btn-sm btn-amber" id="recapBtn" style="display:none;">Missed (0/5)</button>
+        <button type="button" class="btn-sm btn-ghost" id="resetBtn">Reset Round</button>
+        <button type="button" class="btn-sm btn-muted" id="clearExcludedBtn">Clear Excl (0)</button>
+      </div>
+    </div>
+
+    <div class="card" id="quizCard">
+      <div class="muted-note">Loading madden27.csv...</div>
+    </div>
+
+    <datalist id="nflTeamsDatalist"></datalist>
+  </div>
+
+  <script>
+    const POS_GROUP_MAP = {
+      "QB": "QB",
+      "HB": "RB", "RB": "RB", "FB": "RB",
+      "WR": "WR",
+      "TE": "TE",
+      "LT": "OL", "LG": "OL", "C": "OL", "RG": "OL", "RT": "OL", "OT": "OL", "OG": "OL", "T": "OL", "G": "OL",
+      "LEDG": "DL", "REDG": "DL", "DE": "DL", "LDE": "DL", "RDE": "DL", "DT": "DL", "NT": "DL", "LDT": "DL", "RDT": "DL",
+      "MIKE": "LB", "WILL": "LB", "SAM": "LB", "MLB": "LB", "OLB": "LB", "ILB": "LB", "LB": "LB",
+      "CB": "CB",
+      "FS": "S", "SS": "S", "S": "S"
+    };
+
+    const POS_GROUPS = ["QB", "RB", "WR", "TE", "OL", "DL", "LB", "CB", "S"];
+
+    const NFL_TEAMS = [
+      { abbr: "ARI", name: "Arizona Cardinals", aliases: ["arizona", "cardinals", "cards"] },
+      { abbr: "ATL", name: "Atlanta Falcons", aliases: ["atlanta", "falcons"] },
+      { abbr: "BAL", name: "Baltimore Ravens", aliases: ["baltimore", "ravens"] },
+      { abbr: "BUF", name: "Buffalo Bills", aliases: ["buffalo", "bills"] },
+      { abbr: "CAR", name: "Carolina Panthers", aliases: ["carolina", "panthers"] },
+      { abbr: "CHI", name: "Chicago Bears", aliases: ["chicago", "bears"] },
+      { abbr: "CIN", name: "Cincinnati Bengals", aliases: ["cincinnati", "cincy", "bengals"] },
+      { abbr: "CLE", name: "Cleveland Browns", aliases: ["cleveland", "browns"] },
+      { abbr: "DAL", name: "Dallas Cowboys", aliases: ["dallas", "cowboys", "boys"] },
+      { abbr: "DEN", name: "Denver Broncos", aliases: ["denver", "broncos"] },
+      { abbr: "DET", name: "Detroit Lions", aliases: ["detroit", "lions"] },
+      { abbr: "GB",  name: "Green Bay Packers", aliases: ["green bay", "greenbay", "gnb", "packers", "pack"] },
+      { abbr: "HOU", name: "Houston Texans", aliases: ["houston", "texans"] },
+      { abbr: "IND", name: "Indianapolis Colts", aliases: ["indianapolis", "indy", "colts"] },
+      { abbr: "JAX", name: "Jacksonville Jaguars", aliases: ["jacksonville", "jac", "jaguars", "jags"] },
+      { abbr: "KC",  name: "Kansas City Chiefs", aliases: ["kansas city", "kansascity", "kan", "chiefs"] },
+      { abbr: "LV",  name: "Las Vegas Raiders", aliases: ["las vegas", "vegas", "lvr", "oak", "oakland", "raiders"] },
+      { abbr: "LAC", name: "Los Angeles Chargers", aliases: ["sd", "san diego", "chargers", "bolts"] },
+      { abbr: "LAR", name: "Los Angeles Rams", aliases: ["la", "stl", "st louis", "rams"] },
+      { abbr: "MIA", name: "Miami Dolphins", aliases: ["miami", "dolphins", "fins"] },
+      { abbr: "MIN", name: "Minnesota Vikings", aliases: ["minnesota", "minny", "vikings", "vikes"] },
+      { abbr: "NE",  name: "New England Patriots", aliases: ["new england", "nep", "patriots", "pats"] },
+      { abbr: "NO",  name: "New Orleans Saints", aliases: ["new orleans", "nor", "nola", "saints"] },
+      { abbr: "NYG", name: "New York Giants", aliases: ["giants", "gmen"] },
+      { abbr: "NYJ", name: "New York Jets", aliases: ["jets"] },
+      { abbr: "PHI", name: "Philadelphia Eagles", aliases: ["philadelphia", "philly", "eagles"] },
+      { abbr: "PIT", name: "Pittsburgh Steelers", aliases: ["pittsburgh", "pitt", "steelers"] },
+      { abbr: "SF",  name: "San Francisco 49ers", aliases: ["san francisco", "san fran", "sfo", "49ers", "niners"] },
+      { abbr: "SEA", name: "Seattle Seahawks", aliases: ["seattle", "seahawks", "hawks"] },
+      { abbr: "TB",  name: "Tampa Bay Buccaneers", aliases: ["tampa bay", "tampa", "tam", "buccaneers", "bucs"] },
+      { abbr: "TEN", name: "Tennessee Titans", aliases: ["tennessee", "titans"] },
+      { abbr: "WAS", name: "Washington Commanders", aliases: ["washington", "wsh", "commanders", "commies"] }
+    ];
+
+    const TEAM_LOOKUP = {};
+    NFL_TEAMS.forEach(t => {
+      TEAM_LOOKUP[t.abbr.toLowerCase()] = t.abbr;
+      TEAM_LOOKUP[t.name.toLowerCase()] = t.abbr;
+      t.aliases.forEach(a => { TEAM_LOOKUP[a.toLowerCase()] = t.abbr; });
+    });
+
+    const SESSION_EXCL_KEY = "madden27_session_excluded_v2";
+    const PREF_KEY = "madden27_trivia_prefs_v2";
+    const DRILL_BATCH_SIZE = 5;
+
+    let state = {
+      chkTeam: true,
+      chkPos: false,
+      chkOvr: false,
+      exclQb: true,
+      selectedPos: ""
+    };
+
+    let allPlayers = [];
+    let mainDeck = [];
+    let mainIdx = 0;
+
+    let missedBucket = [];
+    let drillDeck = [];
+    let drillIdx = 0;
+    let isDrillMode = false;
+
+    let correctCount = 0;
+    let answeredCount = 0;
+    let answeredCurrent = false;
+    let sessionExcluded = new Set();
+
+    function populateDatalist() {
+      const dl = document.getElementById("nflTeamsDatalist");
+      dl.innerHTML = NFL_TEAMS.map(t =>
+        `<option value="${t.name}">${t.abbr}</option>`
+      ).join("");
+    }
+
+    function resolveTeamInput(raw) {
+      if (!raw) return null;
+      const cleaned = raw.trim().toLowerCase().replace(/[^a-z0-9\s]/g, "").replace(/\s+/g, " ");
+      if (!cleaned) return null;
+      if (TEAM_LOOKUP[cleaned]) return TEAM_LOOKUP[cleaned];
+
+      if (cleaned === "los angeles" || cleaned === "new york") return null;
+
+      if (cleaned.length >= 3) {
+        const matches = new Set();
+        NFL_TEAMS.forEach(t => {
+          if (
+            t.abbr.toLowerCase() === cleaned ||
+            t.name.toLowerCase().includes(cleaned) ||
+            t.aliases.some(a => a.startsWith(cleaned))
+          ) {
+            matches.add(t.abbr);
+          }
+        });
+        if (matches.size === 1) return Array.from(matches)[0];
+      }
+      return null;
+    }
+
+    function getTeamFullName(abbr) {
+      return NFL_TEAMS.find(t => t.abbr === abbr)?.name || abbr;
+    }
+
+    function loadSessionExcluded() {
+      try {
+        const raw = JSON.parse(sessionStorage.getItem(SESSION_EXCL_KEY) || "[]");
+        sessionExcluded = new Set(raw);
+      } catch (_) {
+        sessionExcluded = new Set();
+      }
+      updateExcludedButton();
+    }
+
+    function saveSessionExcluded() {
+      try {
+        sessionStorage.setItem(SESSION_EXCL_KEY, JSON.stringify(Array.from(sessionExcluded)));
+      } catch (_) {}
+      updateExcludedButton();
+    }
+
+    function updateExcludedButton() {
+      document.getElementById("clearExcludedBtn").textContent = `Clear Excl (${sessionExcluded.size})`;
+    }
+
+    function syncToggleButtons() {
+      const btnTeam = document.getElementById("toggleTeam");
+      const btnPos = document.getElementById("togglePos");
+      const btnOvr = document.getElementById("toggleOvr");
+      const btnQb = document.getElementById("toggleExclQb");
+
+      btnTeam.classList.toggle("active", state.chkTeam);
+      btnTeam.textContent = (state.chkTeam ? "✓ " : "") + "Team";
+
+      btnPos.classList.toggle("active", state.chkPos);
+      btnPos.textContent = (state.chkPos ? "✓ " : "") + "Position";
+
+      btnOvr.classList.toggle("active", state.chkOvr);
+      btnOvr.textContent = (state.chkOvr ? "✓ " : "") + "Rating (±5)";
+
+      btnQb.classList.toggle("active", state.exclQb);
+      btnQb.textContent = (state.exclQb ? "✓ " : "") + "No QBs";
+    }
+
+    function loadPrefs() {
+      try {
+        const p = JSON.parse(localStorage.getItem(PREF_KEY) || "{}");
+        if (typeof p.chkTeam === "boolean") state.chkTeam = p.chkTeam;
+        if (typeof p.chkPos === "boolean") state.chkPos = p.chkPos;
+        if (typeof p.chkOvr === "boolean") state.chkOvr = p.chkOvr;
+        if (typeof p.exclQb === "boolean") state.exclQb = p.exclQb;
+        if (p.poolMode) document.getElementById("poolModeSelect").value = p.poolMode;
+        if (p.topX) document.getElementById("topXInput").value = p.topX;
+      } catch (_) {}
+      syncToggleButtons();
+    }
+
+    function savePrefs() {
+      try {
+        localStorage.setItem(PREF_KEY, JSON.stringify({
+          chkTeam: state.chkTeam,
+          chkPos: state.chkPos,
+          chkOvr: state.chkOvr,
+          exclQb: state.exclQb,
+          poolMode: document.getElementById("poolModeSelect").value,
+          topX: document.getElementById("topXInput").value
+        }));
+      } catch (_) {}
+    }
+
+    function parseCSV(text) {
+      const lines = text.trim().split(/\r?\n/);
+      const delim = lines[0].includes("\t") ? "\t" : ",";
+      const headers = lines[0].split(delim).map(h => h.trim().replace(/^"|"$/g, "").toLowerCase());
+
+      const idxFirst = headers.findIndex(h => h === "first name" || h === "firstname");
+      const idxLast = headers.findIndex(h => h === "last name" || h === "lastname");
+      const idxPlayer = headers.findIndex(h => h === "player" || h === "name");
+      const idxPosId = headers.findIndex(h => h === "position id" || h === "positionid");
+      const idxPos = headers.findIndex(h => h === "position" || h === "pos");
+      const idxTeam = headers.findIndex(h => h === "team");
+      const idxOvr = headers.findIndex(h => h === "overall" || h === "ovr");
+
+      const posCol = idxPosId !== -1 ? idxPosId : idxPos;
+      const list = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const cols = lines[i].split(delim).map(c => c.trim().replace(/^"|"$/g, ""));
+        if (cols.length < 4) continue;
+
+        const name = idxPlayer !== -1
+          ? cols[idxPlayer]
+          : `${cols[idxFirst] || ""} ${cols[idxLast] || ""}`.trim();
+        const teamAbbr = resolveTeamInput(cols[idxTeam]);
+        const rawPos = (cols[posCol] || "").trim().toUpperCase();
+        const posGroup = POS_GROUP_MAP[rawPos] || null;
+        const ovr = parseInt(cols[idxOvr], 10);
+
+        if (!name || !teamAbbr || !posGroup || isNaN(ovr)) continue;
+
+        const id = `${name.toLowerCase()}|${teamAbbr}|${rawPos}`;
+        list.push({ id, name, teamAbbr, rawPos, posGroup, ovr });
+      }
+
+      list.sort((a, b) => b.ovr - a.ovr);
+      return list;
+    }
+
+    function shuffle(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function buildPool() {
+      const poolMode = document.getElementById("poolModeSelect").value;
+      const topX = Math.max(1, parseInt(document.getElementById("topXInput").value, 10) || 3);
+
+      let candidates = allPlayers.filter(p => !sessionExcluded.has(p.id));
+      if (state.exclQb) {
+        candidates = candidates.filter(p => p.posGroup !== "QB");
+      }
+
+      if (poolMode === "league") {
+        return candidates.slice(0, topX);
+      }
+
+      const byTeam = {};
+      candidates.forEach(p => {
+        if (!byTeam[p.teamAbbr]) byTeam[p.teamAbbr] = [];
+        if (byTeam[p.teamAbbr].length < topX) {
+          byTeam[p.teamAbbr].push(p);
+        }
+      });
+      return Object.values(byTeam).flat();
+    }
+
+    function updateScoreUI() {
+      document.getElementById("scoreText").textContent = `${correctCount} / ${answeredCount}`;
+      const pct = answeredCount > 0 ? ((correctCount / answeredCount) * 100).toFixed(1) + "%" : "—";
+      document.getElementById("pctText").textContent = pct;
+
+      const recapBtn = document.getElementById("recapBtn");
+      if (missedBucket.length > 0 && !isDrillMode) {
+        recapBtn.style.display = "inline-block";
+        recapBtn.textContent = `Missed (${missedBucket.length}/${DRILL_BATCH_SIZE})`;
+      } else {
+        recapBtn.style.display = "none";
+      }
+    }
+
+    function enterDrillMode() {
+      const activeMisses = missedBucket.filter(p => !sessionExcluded.has(p.id));
+      missedBucket = [];
+      if (activeMisses.length === 0) {
+        isDrillMode = false;
+        updateScoreUI();
+        renderCard();
+        return;
+      }
+      isDrillMode = true;
+      drillDeck = shuffle(activeMisses);
+      drillIdx = 0;
+      answeredCurrent = false;
+      state.selectedPos = "";
+      updateScoreUI();
+      renderCard();
+    }
+
+    function startNewRound() {
+      savePrefs();
+      isDrillMode = false;
+      answeredCurrent = false;
+      state.selectedPos = "";
+
+      mainDeck = shuffle(buildPool());
+      mainIdx = 0;
+      missedBucket = [];
+      drillDeck = [];
+      drillIdx = 0;
+
+      correctCount = 0;
+      answeredCount = 0;
+      updateScoreUI();
+      renderCard();
+    }
+
+    function advanceCard() {
+      if (isDrillMode) {
+        drillIdx++;
+        if (drillIdx >= drillDeck.length) {
+          // Drill batch cleared! Clear drill state and return to exact spot in mainDeck
+          isDrillMode = false;
+          drillDeck = [];
+          drillIdx = 0;
+          updateScoreUI();
+        }
+        renderCard();
+      } else {
+        mainIdx++;
+        // Auto-hijack every time missedBucket reaches 5 (or if mainDeck ends with misses left)
+        if (missedBucket.length >= DRILL_BATCH_SIZE || (mainIdx >= mainDeck.length && missedBucket.length > 0)) {
+          enterDrillMode();
+        } else {
+          renderCard();
+        }
+      }
+    }
+
+    function renderCard() {
+      const card = document.getElementById("quizCard");
+
+      if (!state.chkTeam && !state.chkPos && !state.chkOvr) {
+        card.innerHTML = `<div class="muted-note" style="color:#fca5a5; font-weight:700;">Tap at least one category above (Team, Position, or Rating) to play.</div>`;
+        return;
+      }
+
+      if (mainDeck.length === 0) {
+        card.innerHTML = `<div class="muted-note">No players match your current filter / session exclusions.</div>`;
+        return;
+      }
+
+      if (!isDrillMode && mainIdx >= mainDeck.length) {
+        const pct = answeredCount > 0 ? ((correctCount / answeredCount) * 100).toFixed(1) : "0.0";
+        card.innerHTML = `
+          <div class="player-name">Round Complete</div>
+          <p style="font-size:1.05rem; margin:10px 0;">
+            Score: <strong>${correctCount} / ${answeredCount}</strong> (${pct}%)
+          </p>
+          <div class="quiz-actions" style="margin-top:14px;">
+            <button type="button" class="btn" id="endNewBtn">New Round</button>
+          </div>
+        `;
+        document.getElementById("endNewBtn")?.addEventListener("click", startNewRound);
+        return;
+      }
+
+      const activeDeck = isDrillMode ? drillDeck : mainDeck;
+      const activeIdx = isDrillMode ? drillIdx : mainIdx;
+      const player = activeDeck[activeIdx];
+
+      answeredCurrent = false;
+      state.selectedPos = "";
+
+      const posChipsHtml = POS_GROUPS.map(g =>
+        `<button type="button" class="pos-chip" data-pos="${g}">${g}</button>`
+      ).join("");
+
+      const drillBannerHtml = isDrillMode
+        ? `<div class="drill-banner">
+            <span>⚡ MISSED DRILL (${drillIdx + 1} of ${drillDeck.length})</span>
+            <span>Clears back to main pool after</span>
+          </div>`
+        : "";
+
+      const counterLabel = isDrillMode
+        ? `Drill ${drillIdx + 1} of ${drillDeck.length}`
+        : `${mainIdx + 1} of ${mainDeck.length}`;
+
+      card.innerHTML = `
+        ${drillBannerHtml}
+        <div class="player-top">
+          <div>
+            <div class="counter-tag">${counterLabel}</div>
+            <div class="player-name">${player.name}</div>
+          </div>
+          <button type="button" class="excl-pill" id="excludePlayerBtn" title="Skip this player for your current browser session">
+            ✕ Exclude
+          </button>
+        </div>
+
+        ${state.chkTeam ? `
+          <div class="input-block">
+            <label class="field-label" for="guessTeamInput">Team (e.g. BAL, Ravens, Baltimore)</label>
+            <input
+              type="text"
+              id="guessTeamInput"
+              class="text-input-lg"
+              list="nflTeamsDatalist"
+              placeholder="Type team name, city, or abbr..."
+              autocomplete="off"
+              autocapitalize="words"
+            />
+          </div>
+        ` : ""}
+
+        ${state.chkPos ? `
+          <div class="input-block">
+            <span class="field-label">Position Group</span>
+            <div class="pos-grid" id="posGrid">${posChipsHtml}</div>
+          </div>
+        ` : ""}
+
+        ${state.chkOvr ? `
+          <div class="input-block">
+            <label class="field-label" for="guessOvrInput">Overall Rating (±5 OVR)</label>
+            <input
+              type="number"
+              id="guessOvrInput"
+              class="text-input-lg"
+              min="40"
+              max="99"
+              inputmode="numeric"
+              placeholder="e.g. 88"
+            />
+          </div>
+        ` : ""}
+
+        <div class="quiz-actions">
+          <button type="button" class="btn" id="submitBtn">Submit</button>
+          <button type="button" class="btn btn-ghost" id="skipBtn" style="flex:0 0 auto;">Skip</button>
+        </div>
+
+        <div id="feedbackArea"></div>
+      `;
+
+      document.getElementById("excludePlayerBtn").addEventListener("click", () => {
+        sessionExcluded.add(player.id);
+        saveSessionExcluded();
+        missedBucket = missedBucket.filter(m => m.id !== player.id);
+
+        if (isDrillMode) {
+          drillDeck.splice(drillIdx, 1);
+          mainDeck = mainDeck.filter(m => m.id !== player.id);
+          if (drillIdx >= drillDeck.length) {
+            isDrillMode = false;
+            drillDeck = [];
+            drillIdx = 0;
+          }
+        } else {
+          mainDeck.splice(mainIdx, 1);
+        }
+        updateScoreUI();
+        renderCard();
+      });
+
+      document.querySelectorAll(".pos-chip").forEach(chip => {
+        chip.addEventListener("click", () => {
+          if (answeredCurrent) return;
+          document.querySelectorAll(".pos-chip").forEach(c => c.classList.remove("selected"));
+          chip.classList.add("selected");
+          state.selectedPos = chip.dataset.pos;
+        });
+      });
+
+      document.getElementById("submitBtn").addEventListener("click", () => gradeGuess(player));
+      document.getElementById("skipBtn").addEventListener("click", () => {
+        if (!answeredCurrent) {
+          answeredCount++;
+          if (!isDrillMode && !missedBucket.some(m => m.id === player.id)) {
+            missedBucket.push(player);
+          }
+          updateScoreUI();
+        }
+        advanceCard();
+      });
+
+      const handleEnter = (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          if (!answeredCurrent) {
+            gradeGuess(player);
+          } else {
+            advanceCard();
+          }
+        }
+      };
+
+      const teamInput = document.getElementById("guessTeamInput");
+      const ovrInput = document.getElementById("guessOvrInput");
+      if (teamInput) {
+        teamInput.addEventListener("keydown", handleEnter);
+        teamInput.focus();
+      }
+      if (ovrInput) {
+        ovrInput.addEventListener("keydown", handleEnter);
+        if (!teamInput) ovrInput.focus();
+      }
+    }
+
+    function gradeGuess(player) {
+      if (answeredCurrent) {
+        advanceCard();
+        return;
+      }
+
+      const results = [];
+      let allRight = true;
+
+      if (state.chkTeam) {
+        const rawTeam = document.getElementById("guessTeamInput").value;
+        const resolved = resolveTeamInput(rawTeam);
+        if (!rawTeam.trim()) {
+          document.getElementById("guessTeamInput").focus();
+          return;
+        }
+        const ok = resolved === player.teamAbbr;
+        if (!ok) allRight = false;
+        const guessDisp = resolved || rawTeam.trim();
+        results.push({
+          type: ok ? "ok" : "bad",
+          label: "Team",
+          detail: ok
+            ? `${player.teamAbbr} — ${getTeamFullName(player.teamAbbr)}`
+            : `${guessDisp} → Actual: ${player.teamAbbr} (${getTeamFullName(player.teamAbbr)})`
+        });
+      } else {
+        results.push({
+          type: "ref",
+          label: "Team",
+          detail: `${player.teamAbbr} — ${getTeamFullName(player.teamAbbr)}`
+        });
+      }
+
+      if (state.chkPos) {
+        if (!state.selectedPos) {
+          alert("Tap a position group.");
+          return;
+        }
+        const ok = state.selectedPos === player.posGroup;
+        if (!ok) allRight = false;
+        const posDisp = player.posGroup === player.rawPos
+          ? player.posGroup
+          : `${player.posGroup} (${player.rawPos})`;
+        results.push({
+          type: ok ? "ok" : "bad",
+          label: "Position",
+          detail: ok
+            ? posDisp
+            : `${state.selectedPos} → Actual: ${posDisp}`
+        });
+      } else {
+        const posDisp = player.posGroup === player.rawPos
+          ? player.posGroup
+          : `${player.posGroup} (${player.rawPos})`;
+        results.push({
+          type: "ref",
+          label: "Position",
+          detail: posDisp
+        });
+      }
+
+      if (state.chkOvr) {
+        const rawVal = document.getElementById("guessOvrInput").value;
+        const gOvr = parseInt(rawVal, 10);
+        if (isNaN(gOvr)) {
+          document.getElementById("guessOvrInput").focus();
+          return;
+        }
+        const diff = Math.abs(gOvr - player.ovr);
+        const ok = diff <= 5;
+        if (!ok) allRight = false;
+        const diffNote = diff === 0 ? "Exact!" : (ok ? `within ${diff}` : `off by ${diff}`);
+        results.push({
+          type: ok ? "ok" : "bad",
+          label: "Rating",
+          detail: `${gOvr} → Actual: ${player.ovr} OVR (${diffNote})`
+        });
+      } else {
+        results.push({
+          type: "ref",
+          label: "Rating",
+          detail: `${player.ovr} OVR`
+        });
+      }
+
+      answeredCurrent = true;
+      answeredCount++;
+      if (allRight) {
+        correctCount++;
+      } else if (!isDrillMode && !missedBucket.some(m => m.id === player.id)) {
+        missedBucket.push(player);
+      }
+      updateScoreUI();
+
+      const willHijackNext = !isDrillMode && missedBucket.length >= DRILL_BATCH_SIZE;
+      const submitBtn = document.getElementById("submitBtn");
+      submitBtn.textContent = willHijackNext ? "Start Missed Drill (5) →" : "Next Player →";
+      document.getElementById("skipBtn").style.display = "none";
+
+      const rowsHtml = results.map(r => {
+        const iconCls = r.type === "ok" ? "icon-ok" : (r.type === "bad" ? "icon-bad" : "icon-ref");
+        const iconChar = r.type === "ok" ? "✓" : (r.type === "bad" ? "✗" : "•");
+        const rowCls = r.type === "ref" ? "fb-row ref-row" : "fb-row";
+        return `
+          <div class="${rowCls}">
+            <span class="${iconCls}">${iconChar}</span>
+            <span><strong>${r.label}:</strong> ${r.detail}</span>
+          </div>
+        `;
+      }).join("");
+
+      document.getElementById("feedbackArea").innerHTML = `
+        <div class="feedback-box ${allRight ? "win" : "loss"}">
+          <div class="fb-header">${allRight ? "✓ Correct" : "✗ Missed"}</div>
+          ${rowsHtml}
+        </div>
+      `;
+    }
+
+    async function init() {
+      populateDatalist();
+      loadPrefs();
+      loadSessionExcluded();
+
+      try {
+        const res = await fetch("madden27.csv");
+        if (!res.ok) throw new Error("Could not load madden27.csv");
+        allPlayers = parseCSV(await res.text());
+        startNewRound();
+      } catch (err) {
+        document.getElementById("quizCard").innerHTML =
+          `<div class="muted-note" style="color:#fca5a5;">Error loading madden27.csv: ${err.message}</div>`;
+      }
+    }
+
+    document.getElementById("toggleTeam").addEventListener("click", () => {
+      state.chkTeam = !state.chkTeam;
+      syncToggleButtons();
+      savePrefs();
+      if (!answeredCurrent) renderCard();
+    });
+
+    document.getElementById("togglePos").addEventListener("click", () => {
+      state.chkPos = !state.chkPos;
+      syncToggleButtons();
+      savePrefs();
+      if (!answeredCurrent) renderCard();
+    });
+
+    document.getElementById("toggleOvr").addEventListener("click", () => {
+      state.chkOvr = !state.chkOvr;
+      syncToggleButtons();
+      savePrefs();
+      if (!answeredCurrent) renderCard();
+    });
+
+    document.getElementById("toggleExclQb").addEventListener("click", () => {
+      state.exclQb = !state.exclQb;
+      syncToggleButtons();
+      startNewRound();
+    });
+
+    document.getElementById("poolModeSelect").addEventListener("change", () => {
+      const mode = document.getElementById("poolModeSelect").value;
+      const topXEl = document.getElementById("topXInput");
+      const curVal = parseInt(topXEl.value, 10) || 3;
+      if (mode === "league" && curVal <= 10) topXEl.value = 50;
+      if (mode === "team" && curVal > 15) topXEl.value = 3;
+      startNewRound();
+    });
+
+    document.getElementById("topXInput").addEventListener("change", startNewRound);
+    document.getElementById("resetBtn").addEventListener("click", startNewRound);
+    document.getElementById("recapBtn").addEventListener("click", enterDrillMode);
+    document.getElementById("clearExcludedBtn").addEventListener("click", () => {
+      sessionExcluded.clear();
+      saveSessionExcluded();
+      startNewRound();
+    });
+
+    init();
+  </script>
+</body>
+</html>
